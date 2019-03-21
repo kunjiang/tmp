@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <script src="../src/jklib.vnode.0.0.0.1.js"></script>
+  <script>
+    var VNode = jklib.test.VNode;
+
+    var node = new VNode( 'div', { title: '一段测试' }, 
+      new VNode( 'vp-1', { className: 'paragraph', title: 'p1' } ),
+      new VNode( 'vp-2', { className: 'paragraph', title: 'p2' } ),
+      new VNode( 'vp-3', { className: 'paragraph', title: 'p3' } ),
+      new VNode( 'vp-4', { className: 'paragraph', title: 'p3' } )  
+    );
+
+    console.log( node );
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h2>测试标签类型</h2>
+  <script type="text/template" id="tpl">
+    <p1>第一段标签</p1>    
+    <input type="text" />
+    <br />
+    <hr />
+    <div>
+      <p21>第二段(2.1)</p21>
+      <p22>第二段(2.2)</p22>
+      <p23>第二段(2.3)</p23>
+    </div>
+  </script>
+
+
+  <script src="../src/jklib.0.0.0.2.js"></script>
+  <script>
+    var dv = document.getElementById( 'tpl' );
+
+    var obj = new jklib.init( dv.innerHTML );
+
+    var s = [];
+    while( obj.next() ) {
+      s.push( obj.current );
+    }
+    
+    var res = s.map( v => {
+      var nodeType = jklib.test.checkNodeType( v );
+      var test = null;
+      switch( nodeType ) {
+        case 1: {
+          var elemType = jklib.test.checkElementType( v );
+          switch ( elemType ) {
+            case 1: test = '开始元素'; break;
+            case 2: test = '结束元素'; break;
+            case 3: test = '自闭合元素'; break;
+            default: test = '元素类型错误'; break;
+          }
+          
+        } break;
+        case 3: test = '文本节点'; break;
+        default: test = '节点类型错误'; break;
+      }
+
+
+      return {
+        xml: v,
+        test: test
+      };
+    });
+
+    console.table( res );
+    
+    
+
+  </script>
+</body>
+</html>

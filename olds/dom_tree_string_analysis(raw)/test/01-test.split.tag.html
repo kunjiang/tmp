@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <!-- 第一段测试 -->
+  <!-- <div id="dv">
+    <p>111</p>
+    <div>
+      222
+      <p>333</p>
+      444
+    </div>
+  </div> -->
+
+
+  <!-- 第二段测试 -->
+  <div id="dv">
+    <p1>第一段标签</p1>    
+    <div>
+      <p21>第二段(2.1)</p21>
+      <p22>第二段(2.2)</p22>
+      <p23>第二段(2.3)</p23>
+    </div>
+    <div>
+      <p31>
+        第三段(3.1)
+        <p311>第三段(3.1.1)</p311>
+        <p312>第三段(3.1.2)</p312>
+        <p313>第三段(3.1.3)</p313>
+        <p314>第三段(3.1.4)</p314>
+        第三段(3.1)
+      </p31>
+      <p32>
+          第三段(3.2)
+          <p321>第三段(3.2.1)</p321>
+          <p322>第三段(3.2.2)</p322>
+          <p323>第三段(3.2.3)</p323>
+          <p324>第三段(3.2.4)</p324>
+          第三段(3.2)
+        </p32>
+    </div>
+  </div>
+
+
+  <script src="../src/jklib.0.0.0.1.js"></script>
+  <script>
+    var dv = document.getElementById( 'dv' );
+
+    var res = jklib.XMLParse( dv.innerHTML );
+
+    // console.log( res );
+    console.log( res.join('') == dv.innerHTML );
+  
+  </script>
+</body>
+</html>
