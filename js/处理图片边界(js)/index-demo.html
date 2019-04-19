@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h1>算法 测试 demo</h1>
+  <p>算法描述</p>
+  <ul>
+    <li>将图片转换为 二值图</li>
+    <li>搜索轮廓路径</li>
+    <li>获得路径</li>
+    <li>创建 canvas 绘制路径</li>
+    <li>利用 canvas 裁切</li>
+  </ul>
+
+  <div>
+    <div>
+      <button onclick="getBinValImage()">生成 二值图</button>
+      <button onclick="getOutline()">获得外部路径</button>
+      <button>处理背景</button>
+    </div>
+    <div>原始图</div>
+    <div><img src="" alt=""></div>
+  </div>
+</body>
+</html>
+
+<script>
+
+  // 将图片处理成白底图( 准备图片的时候使用 )
+  function preFn() {
+    var img = new Image();
+    img.src = './input/1.png';
+    img.onload = function () {
+
+      var w = this.width;
+      var h = this.height;
+
+      var cas = document.createElement( 'canvas' );
+      cas.width = w;
+      cas.height= h;
+
+      var ctx = cas.getContext( '2d' );
+      ctx.fillStyle = '#FFF';
+      ctx.fillRect( 0, 0, w, h );
+      ctx.drawImage( img, 0, 0 );
+
+
+      document.querySelector( 'img' ).src = cas.toDataURL( 'image/png', 1 );
+
+    };
+  }
+  // preFn();
+
+
+  // 将图片转换为 二值图
+  // 由于图片的特殊性, 像素点 ( 255, 255, 255, 1 ) 以外的点均设置为 ( 0, 0, 0, 1 )
+  // 这里不需要统计直方图
+  function getBinValImage() {
+    var imgurl = './input/2-white.png';
+
+    var img = new Image();
+
+    img.src = imgurl;
+
+    img.onload = function () {
+      var w = this.width;
+      var h = this.height;
+
+      var canvas = document.createElement( 'canvas' );
+
+      canvas.height = h;
+      canvas.width = w;
+
+      var ctx = canvas.getContext( '2d' );
+      
+      ctx.drawImage( img, 0, 0 );
+
+      var imageData = ctx.getImageData( 0, 0, w, h );
+
+      // 处理图像的 二值
+      var points = [];
+      for ( var i = 0; i < imageData.data.length; i += 4 ) {
+        // var r = imageData.data[ i ];
+        // var g = imageData.data[ i + 1 ];
+        // var b = imageData.data[ i + 2 ];
+        // var a = imageData.data[ i + 3 ];
+
+        // 处理
+        imageData.data[ i ] = imageData.data[ i ] === 255 ? imageData.data[ i ] : 0;
+        imageData.data[ i + 1 ] = imageData.data[ i + 1 ] === 255 ? imageData.data[ i + 1 ] : 0;
+        imageData.data[ i + 2 ] = imageData.data[ i + 2 ] == 255 ? imageData.data[ i + 2 ] : 0;
+        imageData.data[ i + 3 ] = 255;
+
+      }
+
+      ctx.putImageData( imageData, 0, 0 );
+
+      document.querySelector( 'img' ).src = canvas.toDataURL( 'image/png', 1 );
+    };
+
+  }
+
+
+  // 获得 二值图的 轮廓线( 坐标 )
+  // 算法: 
+  // 1. 遍历二值图的 每一个 point
+  // 2. 如果 point 的 周围 八个 邻域 为 同色即为 内部点, 设置为 255 白色, 留下的即为轮廓线
+  // 
+
+  function getOutline() {
+    var imgurl = './input/2-white.png';
+    // var imgurl = './input/3.png';
+
+    var img = new Image();
+
+    img.src = imgurl;
+
+    img.onload = function () {
+      var w = this.width;
+      var h = this.height;
+
+      var canvas = document.createElement( 'canvas' );
+
+      canvas.height = h;
+      canvas.width = w;
+
+      var ctx = canvas.getContext( '2d' );
+      
+      ctx.drawImage( img, 0, 0 );
+
+      var imageData = ctx.getImageData( 0, 0, w, h );
+
+      // 处理图像的 二值
+      var points = [];
+      for ( var i = 0; i < imageData.data.length; i += 4 ) {
+        // var r = imageData.data[ i ];
+        // var g = imageData.data[ i + 1 ];
+        // var b = imageData.data[ i + 2 ];
+        // var a = imageData.data[ i + 3 ];
+
+        // 处理
+        imageData.data[ i ] = imageData.data[ i ] === 255 ? imageData.data[ i ] : 0;
+        imageData.data[ i + 1 ] = imageData.data[ i + 1 ] === 255 ? imageData.data[ i + 1 ] : 0;
+        imageData.data[ i + 2 ] = imageData.data[ i + 2 ] === 255 ? imageData.data[ i + 2 ] : 0;
+        imageData.data[ i + 3 ] = 255;
+
+      }
+
+      // 处理 二值图, 获得边界
+      
+      var list_need_set_255 = []; 
+      for ( var i = 0; i < imageData.data.length; i += 4 ) {
+        // let x = Math.floor( i % w );
+        // let y = Math.floor( i / w );
+
+        // 色值只有 255, 255, 255, 255 和 0, 0, 0, 255
+
+        var currPointColorValue = imageData.data[ i ] +
+                                  imageData.data[ i + 1 ] +
+                                  imageData.data[ i + 2 ] +
+                                  imageData.data[ i + 3 ];
+
+        // left top       左上 i - w  * 4 - 4
+        var lt =  imageData.data[ i - w  * 4 - 4 ] +
+                  imageData.data[ i - w  * 4 - 4 + 1 ] +
+                  imageData.data[ i - w  * 4 - 4 + 2 ] +
+                  imageData.data[ i - w  * 4 - 4 + 3 ];
+
+        // center top     上边 i - w * 4
+        var ct =  imageData.data[ i - w * 4 ] +
+                  imageData.data[ i - w * 4 + 1 ] +
+                  imageData.data[ i - w * 4 + 2 ] +
+                  imageData.data[ i - w * 4 + 3 ];
+
+        // right top      右上 i - w  * 4 + 4
+        var rt =  imageData.data[ i - w  * 4 + 4 ] +
+                  imageData.data[ i - w  * 4 + 4 + 1 ] +
+                  imageData.data[ i - w  * 4 + 4 + 2 ] +
+                  imageData.data[ i - w  * 4 + 4 + 3 ];
+                  
+        // left center    左边 i - 4
+        var lc =  imageData.data[ i - 4 ] +
+                  imageData.data[ i - 4 + 1 ] +
+                  imageData.data[ i - 4 + 2 ] +
+                  imageData.data[ i - 4 + 3 ];
+
+        // right center   右边 i + 4
+        var rc =  imageData.data[ i + 4 ] +
+                  imageData.data[ i + 4 + 1 ] +
+                  imageData.data[ i + 4 + 2 ] +
+                  imageData.data[ i + 4 + 3 ];
+
+        // left bottom    左下 i + w * 4 - 4
+        var lb =  imageData.data[ i + w * 4 - 4 ] +
+                  imageData.data[ i + w * 4 - 4 + 1 ] +
+                  imageData.data[ i + w * 4 - 4 + 2 ] +
+                  imageData.data[ i + w * 4 - 4 + 3 ];
+
+        // center bottom  下边 i + w * 4
+        var cb =  imageData.data[ i + w * 4 ] +
+                  imageData.data[ i + w * 4 + 1 ] +
+                  imageData.data[ i + w * 4 + 2 ] +
+                  imageData.data[ i + w * 4 + 3 ];
+
+        // right bottom   右下 i + w * 4 + 4
+        var rb =  imageData.data[ i + w * 4 + 4 ] +
+                  imageData.data[ i + w * 4 + 4 + 1 ] +
+                  imageData.data[ i + w * 4 + 4 + 2 ] +
+                  imageData.data[ i + w * 4 + 4 + 3 ];
+
+
+        // 相等即为内部, 设置为 白色
+        if ( 
+          currPointColorValue === lt &&
+          currPointColorValue === ct &&
+          currPointColorValue === rt &&
+          currPointColorValue === lc &&
+          currPointColorValue === rc &&
+          currPointColorValue === lb &&
+          currPointColorValue === cb &&
+          currPointColorValue === rb
+        ) {
+          // imageData.data[ i ] = 
+          // imageData.data[ i + 1 ] =
+          // imageData.data[ i + 2 ] =
+          // imageData.data[ i + 3 ] = 255;
+          list_need_set_255.push( i );
+        } 
+      }
+
+      // 绘制边界
+      for ( var i = 0; i < list_need_set_255.length; i++ ) {
+        imageData.data[ list_need_set_255[ i ] ] = 
+        imageData.data[ list_need_set_255[ i ] + 1 ] =
+        imageData.data[ list_need_set_255[ i ] + 2 ] =
+        imageData.data[ list_need_set_255[ i ] + 3 ] = 255;
+      }
+
+      ctx.putImageData( imageData, 0, 0 );
+      document.querySelector( 'img' ).src = canvas.toDataURL( 'image/png', 1 );
+
+      // 得到 边界图, 处理 边界图 计算轮廓线
+      var outline = [];
+
+    };
+  }
+
+
+
+</script>

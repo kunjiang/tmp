@@ -1,0 +1,12 @@
+{
+  "name": "node.canvas.tools",
+  "version": "1.0.0",
+  "description": "处理图像的脚本( 将白底图处理为 背景 透明 )",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
