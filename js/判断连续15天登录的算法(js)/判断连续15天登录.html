@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let test = [
+            // 1,
+            // 2,
+            3,
+            4,
+            5,
+            6,
+            // 7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            // 14,
+            // 15,
+            // 16,
+            // 17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31
+        ];
+
+        function tool( num ) {
+            let t = [];
+            while( t.length < num - 1 ) {
+                t.push( '0' );
+            }
+            t.push( '1' );
+            return t.reverse().join( '' );
+        }
+
+        let login_record = test.reduce( ( res, v ) => {
+            let s = tool( v );
+            let r = parseInt( tool( v ), 2 );
+            res |= r;
+            console.log( v, s, s.length, r, res );
+            return res;
+        }, 0 );
+
+        let sample = '111111111111111';
+
+        function check15days( login_record, sample ) {
+            let s = parseInt( sample, 2 );
+            let r = login_record;
+
+            for ( let i = 0; i < 17; s = s << 1, i++ ) {
+                console.log( `第 ${ i + 1 } 次检查, s = `, s, s & r );
+                if( (s & r) === s ) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        console.log( check15days( login_record, sample ) );
+
+    </script>
+</body>
+</html>
