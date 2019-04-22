@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -11,8 +12,28 @@ namespace _01_测试用例
     {
         static void Main(string[] args)
         {
+            if (!Directory.Exists("output")) Directory.CreateDirectory("output");
+            if (!Directory.Exists("input")) Directory.CreateDirectory("input");
+
+            string[] files = Directory.GetFiles("./input");
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                Process(files[i]);
+            }
+
+            Console.WriteLine("抠图成功");
+ 
+            Console.ReadKey();
+
+
+        }
+
+
+        static void Process(string path)
+        {
             // 读取图片
-            Image img = Image.FromFile("./1.png");
+            Image img = Image.FromFile(path);
 
             // 获得 Bitmap 实例
             Bitmap bitmap = new Bitmap(img);
@@ -38,65 +59,11 @@ namespace _01_测试用例
                     {
                         bitmap.SetPixel(x, y, black);
                     }
-                    
+
                 }
             }
 
-            // 保存
-            bitmap.Save("binary image.png", ImageFormat.Png);
-
-            Console.WriteLine("保存 二值图 成功");
-
-
-
-            /*
-            List<Point> list = new List<Point>();
-
-            // 生成边框(算法应该可以避免)
-            for (int x = 1; x < width - 1; x++)
-            {
-                for (int y = 1; y < height - 1; y++)
-                {
-                    // 计算 ( x, y ) 邻域的颜色是否与当前点相同
-                    Color c = bitmap.GetPixel(x, y);
-
-                    Color clt = bitmap.GetPixel(x - 1, y - 1);
-                    Color cct = bitmap.GetPixel(x, y - 1);
-                    Color crt = bitmap.GetPixel(x + 1, y - 1);
-                    Color clc = bitmap.GetPixel(x - 1, y);
-                    Color crc = bitmap.GetPixel(x + 1, y);
-                    Color clb = bitmap.GetPixel(x - 1, y + 1);
-                    Color ccb = bitmap.GetPixel(x, y + 1);
-                    Color crb = bitmap.GetPixel(x + 1, y + 1);
-
-                    if (
-                        c.ToArgb() == clt.ToArgb()
-                        && c.ToArgb() == cct.ToArgb()
-                        && c.ToArgb() == crt.ToArgb()
-                        && c.ToArgb() == clc.ToArgb()
-                        && c.ToArgb() == crc.ToArgb()
-                        && c.ToArgb() == clb.ToArgb()
-                        && c.ToArgb() == ccb.ToArgb()
-                        && c.ToArgb() == crb.ToArgb()
-                    )
-                    {
-                        list.Add(new Point(x, y));
-                    }
-                }
-            }
-            // 处理颜色
-            for (int i = 0; i < list.Count; i++)
-            {
-                Point pt = list[i];
-                bitmap.SetPixel(pt.X, pt.Y, white);
-            }
-
-            bitmap.Save("line out.png", ImageFormat.Png);
-            Console.WriteLine("生成边框");
-            */
-
-
-
+            
             // 抠图 (将白色区域的点设置为透明)
             Bitmap bitmap2 = new Bitmap(img);
 
@@ -110,15 +77,11 @@ namespace _01_测试用例
                     }
                 }
             }
+            
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            string newFileName = Path.Combine("output", fileName + "_抠图.png");
 
-            bitmap2.Save("抠图.png", ImageFormat.Png);
-
-            Console.WriteLine("抠图成功");
-
-
-            Console.ReadKey();
-
-
+            bitmap2.Save(newFileName, ImageFormat.Png);
         }
     }
 }
