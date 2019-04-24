@@ -1,0 +1,294 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:roadhog-notes</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="roadhog-">roadhog 使用笔记</h1>
+<p>Roadhog 是用于 dev, build 和测试命令的 cli 工具. 
+它基于 react-dev-utils, 同时与 create-=react-app 的项目一同开发.
+你可以将其想象成 create-react-app 的配置版.</p>
+<h2 id="-">快速开始</h2>
+<pre><code class="lang-sh"># 1. 安装
+$ npm i roadhog -g
+
+# 2. 检查版本
+$ roadhog -v
+
+# 3. 本地开发
+$ roadhog dev
+
+# 4. 编译构建
+$ roadhog build
+$ NO_COMPRESS=1 roadhog build
+
+# 5. 测试
+$ roadhog test
+
+</code></pre>
+<h2 id="mock">Mock</h2>
+<p>roadhog 支持 Mock, 配置写在 <code>.roadhog.mock.js</code> 文件中</p>
+<p>例如:</p>
+<pre><code class="lang-js">export default {
+    // 支持数据类型: 对象 或 数组
+    &#39;GET /api/users&#39;: { users: [ 1, 2 ] }
+    // GET 或 POST 方法可以被省略
+    , &#39;/api/users/1&#39;: { id: 1 }
+    // 支持自定义函数, API 与 express@4 一致
+    , &#39;POST /api/users/create&#39;: ( req, res ) =&gt; res.end( &#39;OK&#39; )
+};
+</code></pre>
+<h2 id="-public-">使用 public 目录</h2>
+<p>在 public 目录下的文件, 在 开发 与 编译的 是后会被拷贝到输出目录下 ( 默认为 ./dist 目录 ).
+因此, favicon, iconfont, html, 引用的图等都可以存储到该目录中.</p>
+<h2 id="-">配置</h2>
+<p>roadhog 的 webpack 部分是基于 af-webpack 的实现. 
+在项目根目录下创建 <code>.webpackrc</code> 文件编写配置项. 配置实用 JSON 格式.</p>
+<p>例如:</p>
+<pre><code class="lang-json">{
+    &quot;externals&quot;: { &quot;react&quot;: &quot;window.React&quot; }
+}
+</code></pre>
+<p>如果你喜欢 JS 的配置方式, 或需要编写代码实现一些高级判断, 
+你可以使用 <code>.webpackrc.js</code> 文件来配置, 它支持 ES6 语法. 例如:</p>
+<pre><code class="lang-js">export default {
+    externals: { react: &#39;window.React&#39; }
+}
+</code></pre>
+<h3 id="-">配置项索引</h3>
+<h3 id="entry-">entry 配置项</h3>
+<p>指定 webpack 入口, 支持 glob 格式.</p>
+<p>假定项目中包含多个页面, 需要的页面在 <code>src/pages</code> 目录下. 你可以如下处理:</p>
+<pre><code class="lang-json">    &quot;entry&quot;: &quot;src/pages/*.js&quot;
+</code></pre>
+<h3 id="theme-">theme 配置项</h3>
+<p>配置主题, 实际上就是 less 变量. 支持对象和字符串类型. 
+字符串需要指向一个返回配置的文件. 例如</p>
+<pre><code class="lang-json">&quot;theme&quot;: {
+    &quot;@primary-color&quot;: &quot;#1DA57A&quot;
+}
+</code></pre>
+<p>或者</p>
+<pre><code class="lang-json">&quot;theme&quot;: &quot;./theme-config.js&quot;
+</code></pre>
+<h3 id="define-">define 配置项</h3>
+<p>通过 webpack 的 DefinePlugin 插件来转到代码, 该值会被 <code>JSON.stringify</code> 处理.</p>
+<p>例如:</p>
+<pre><code class="lang-json">&quot;define&quot;: {
+    &quot;process.env.TEST&quot;: 1,
+    &quot;USE_COMMA&quot;: 2
+}
+</code></pre>
+<h3 id="externals-">externals 配置项</h3>
+<p>配置 webpack 的 externals 属性. 例如:</p>
+<pre><code class="lang-json">&quot;externals&quot;: {
+    &quot;react&quot;: &quot;window.React&quot;,
+    &quot;react-dom&quot;: &quot;window.ReactDOM&quot;
+}
+</code></pre>
+<h3 id="alias-">alias 配置项</h3>
+<p>配置 webpack 的 resolve.alias 属性</p>
+<h3 id="extraresolveextensions-">extraResolveExtensions 配置项</h3>
+<p>配置 webpack 的 resolve.extensions 属性.</p>
+<h3 id="browserslist-">browserslist 配置项</h3>
+<p>配置 browserslist, 作用于 babel-preset-env 和 autoprefixer.</p>
+<p>例如:</p>
+<pre><code class="lang-json">&quot;browserslist&quot;: [
+    &quot;&gt; 1%&quot;,
+    &quot;last 2 versions&quot;
+]
+</code></pre>
+<h3 id="publicpath-">publicPath 配置项</h3>
+<p>配置 webpack 的 output.publicPath 属性.</p>
+<h3 id="outputpath-">outputPath 配置项</h3>
+<p>配置 webpack 的 output.path 属性.</p>
+<h3 id="devtool">devtool</h3>
+<p>配置 webpack 的 devtool 属性.</p>
+<h3 id="commons-">commons 配置项</h3>
+<p>配置 webpack 的 CommonsChunkPlugin 插件, 格式为 Array. 例如:</p>
+<pre><code class="lang-js">&quot;commons&quot;: [
+    {
+        async: &#39;__common&#39;,
+        children: true,
+        minChunks( module, count ) {
+            if ( pageCount &lt;= 2 ) {
+                return count &gt;= pageCount;
+            }
+            return count &gt;= pageCount * 0.5;
+        }
+    }
+
+]
+</code></pre>
+<h3 id="hash-">hash 配置项</h3>
+<p>配置用于构建时的 hash 文件名, 一般连同 manifest 一起使用.</p>
+<h3 id="html-">html 配置项</h3>
+<p>配置 html-webpack-plugin 插件. 例如:</p>
+<pre><code class="lang-js">&quot;html&quot;: {
+    &quot;template&quot;: &#39;./src/index.ejs&#39;
+}
+</code></pre>
+<h3 id="disablecssmodules-">disableCSSModules 配置项</h3>
+<p>禁用 CSS 模块化. 我并不建议这样.</p>
+<h3 id="disablecsssourcemap-">disableCSSSourceMap 配置项</h3>
+<p>禁用生成 CSS SourceMap.</p>
+<h3 id="extrababelpresets-">extraBabelPresets 配置项</h3>
+<p>定义 babel 的预处理列表. 使用数组格式.</p>
+<h3 id="extrababelplugins-">extraBabelPlugins 配置项</h3>
+<p>定义 babel 插件列表, 使用数组格式.</p>
+<h3 id="extrababelincludes-">extraBabelIncludes 配置项</h3>
+<p>定义需要由 babel 处理转换的文件列表. 使用数组格式.</p>
+<h3 id="copy-">copy 配置项</h3>
+<p>定义需要被拷贝的文件列表. 使用数组格式. 
+同时, 每一项引用 copy-webpack-plugin 的配置.</p>
+<p>例如:</p>
+<pre><code class="lang-js">&quot;copy&quot;: [
+    {
+        &quot;from&quot;: &quot;&quot;,
+        &quot;to&quot;: &quot;&quot;
+    }
+]
+</code></pre>
+<h3 id="proxy-">proxy 配置项</h3>
+<p>配置 webpack-dev-server 中的 proxy 属性.</p>
+<p>例如 将请求代理到其他服务器上.</p>
+<pre><code class="lang-js">&quot;proxy&quot;: {
+    &quot;/api&quot;: {
+        &quot;target&quot;: &quot;http://jsonplaceholder.typicode.com&quot;,
+        &quot;changeOrigin&quot;: true,
+        &quot;pathRewrite&quot;: { &quot;^/api&quot;: &quot;&quot; }
+    }
+
+}
+</code></pre>
+<p>那么就可以通过访问 /api/users 来获取 <a href="http://jsonplaceholder.typicode.com/users">http://jsonplaceholder.typicode.com/users</a> 中的数据了.</p>
+<h3 id="sass-">sass 配置项</h3>
+<p>配置 node-sass 选项. </p>
+<p>注意: 考虑到 node-sass 和 sass-loader 的依赖性, 
+在使用 sass 的时候, 必须在项目目录下安装它们.</p>
+<h3 id="manifest-">manifest 配置项</h3>
+<p>配置生成 manifest.json. 其选项转到 <a href="https://www.npmjs.com/package/webpack-manifest-plugin">https://www.npmjs.com/package/webpack-manifest-plugin</a></p>
+<p>例如:</p>
+<pre><code class="lang-js">&quot;manifest&quot;: {
+    &quot;basePath&quot;: &quot;/app/&quot;
+}
+</code></pre>
+<h3 id="ignoremomentlocale-">ignoreMomentLocale 配置项</h3>
+<p>Ignore moment locale file, used to reduce the size.</p>
+<h3 id="disabledynamicimport-">disableDynamicImport 配置项</h3>
+<p>Disable import () to load on demand, but bundle all the files in a single file, implement via babel-plugin-dynamic-import-node-sync(<a href="https://github.com/seeden/babel-plugin-dynamic-import-node-sync)">https://github.com/seeden/babel-plugin-dynamic-import-node-sync)</a>.</p>
+<h3 id="env-">env 配置项</h3>
+<p>指定一个环境. development 用于 dev, production 用于 build. 例如:</p>
+<pre><code class="lang-js">&quot;extraBabelPlugins&quot;: [ &quot;transform-runtime&quot; ],
+&quot;env&quot;: {
+    &quot;development&quot;: {
+        &quot;extraBabelPlugins&quot;: [ &quot;dva-hmr&quot; ]
+    }
+}
+</code></pre>
+<p>那么在 开发环境中, extraBabelPlugins 为 [ &quot;transform-runtime&quot;, &quot;dva-hmr&quot; ]. 
+而在生产环境中为 [ &quot;transform-runtime&quot; ]</p>
+<h2 id="-">环境变量</h2>
+<p>你可以临时配置的环境变量有:</p>
+<ul>
+<li>PORT, 默认为 8000</li>
+<li>HOST, 默认为 localhost</li>
+<li>ANALYZE, 在 roadhog 构建时是否分析输出的 bundle</li>
+<li>ESLINT, 设置 none 来禁用 eslint 检查</li>
+<li>TSLINT, 设置 none 来禁用 tslint 检查</li>
+<li>COMPRESS, 设置 none 来禁用在 roadhog 构建时进行文件压缩</li>
+<li>BROWSER, 设置 none 来阻止在 roadhog 开发环境下打开浏览器</li>
+</ul>
+<p>例如, 在 3000 端口中启动开发服务</p>
+<pre><code class="lang-sh"># OS X 或 Linux 系统下
+$ PORT=3000 roadhog dev
+
+# win 中 cmd 下
+&gt; set PORT=3000 &amp;&amp; roadhog dev
+
+# 在所有平台下使用 cross-env
+$ cross-env PORT=3000 roadhog dev
+</code></pre>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
